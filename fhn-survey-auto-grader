@@ -1,0 +1,166 @@
+# auto-grader for 2019 Financial Health Network (formerly CFSI) Survey
+
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jun 24 06:53:12 2019
+
+@author: Heather
+"""
+
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jun 20 17:28:55 2019
+
+@author: Heather
+"""
+
+import pandas as pd
+#importing data --> need to think about how to make this more modular 
+survey_data = pd.read_csv('C:/Users/Heather/Documents/cfsi_steady.csv')
+#renaming columns
+survey_data.columns = [ 'TIMESTAMP','Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8']
+
+#Q1 Which of the following statements best describes how your household’s total income compared to total spending, over the last 12 months?
+def set_score_1(row):
+        if row["Q1"] == "Spending was much less than income":
+         return 100
+        elif row["Q1"] == "Spending was a little less than income":
+         return 75
+        elif row["Q1"] == "Spending was about equal to income":
+         return 50
+        elif row["Q1"] == "Spending was a little more than income":
+         return 25
+        elif row["Q1"] == "Spending was much more than income":
+         return 0
+survey_data = survey_data.assign(score_1=survey_data.apply(set_score_1, axis = 1))             
+          
+#Q2 Which of the following statements best describes how your household has paid its bills over the last 12 months? My household has been financially able to:
+def set_score_2(row):
+       if row["Q2"] == "Pay all our bills on time":
+        return 100
+       elif row["Q2"] == "Pay nearly all our bills on time":
+        return 60
+       elif row["Q2"] == "Pay most of our bills on time":
+        return 40    
+       elif row["Q2"] == "Pay some of our bills on time":
+        return 20
+       elif row["Q2"] == "Pay very few of our bills on time":
+        return 0
+survey_data = survey_data.assign(score_2=survey_data.apply(set_score_2, axis = 1))  
+
+
+#Q3 At your current level of spending, how long could you and your household afford to cover expenses, if you had to live only off the money you have readily available, without withdrawing money from retirement accounts or borrowing?
+def set_score_3(row):           
+           if row["Q3"]  == "6 months or more":
+            return 100
+           elif row["Q3"] == "3-5 months":
+            return 75
+           elif row["Q3"] == "1-2 months":
+            return 50
+           elif row["Q3"] == "1-2 weeks":
+            return 25
+           elif row["Q3"] == "Less than 1 week":
+            return 0
+survey_data = survey_data.assign(score_3=survey_data.apply(set_score_3, axis = 1))  
+
+
+#Q4 Thinking about your household’s longer term financial goals such as saving for a vacation, starting a business, buying or paying off a home, saving up for education, putting money away for retirement, or making retirement funds last… How confident are you that your household is currently doing what is needed to meet your longer term goals?
+def set_score_4(row):
+           if row["Q4"] == "Very confident":
+            return 100
+           elif row["Q4"]  == "Moderately confident":
+            return 75
+           elif row["Q4"]  == "Somewhat confident":
+            return 50
+           elif row["Q4"] == "Slightly confident":
+            return 25
+           elif row["Q4"] == "Not at all confident":
+            return 0
+survey_data = survey_data.assign(score_4=survey_data.apply(set_score_4, axis = 1))  
+            
+
+#Q5 Thinking about all of your household’s current debts, including mortgages, bank loans, student loans, money owed to people, medical debt, past-due bills, and credit card balances that are carried over from prior months… As of today, which of the following statements describes how manageable your household debt is?
+def set_score_5(row):
+           if row["Q5"]  == "Have a manageable amount of debt":
+            return 85
+           elif row["Q5"]  == "Have a bit more debt than is manageable":
+            return 40
+           elif row["Q5"]  == "Have far more debt than is manageable":
+            return 0
+           elif row["Q5"]  == "Do not have any debt":
+            return 100
+survey_data = survey_data.assign(score_5=survey_data.apply(set_score_5, axis = 1))  
+
+
+#Q6 How would you rate your credit score? Your credit score is a number that tells lenders how risky or safe you are as a borrower.
+def set_score_6(row):
+           if row["Q6"]  == "Excellent":
+            return 100
+           elif row["Q6"]  == "Very Good":
+            return 80
+           elif row["Q6"]  == "Good":
+            return 60
+           elif row["Q6"]  == "Fair":
+            return 40
+           elif row["Q6"]  == "Poor":
+            return 0
+           elif row["Q6"]  == "I don't know":
+            return 0
+survey_data = survey_data.assign(score_6=survey_data.apply(set_score_6, axis = 1))  
+        
+
+#Q7 Thinking about all of the types of insurance you and others in your household currently might have, including health insurance, vehicle insurance, home or rental insurance, life insurance, and disability insurance… How confident are you that those insurance policies will provide enough support in case of an emergency?
+def set_score_7(row):
+           if row["Q7"] == "Very confident":
+            return 100
+           elif row["Q7"] == "Moderately confident":
+            return 75
+           elif row["Q7"] == "Somewhat confident":
+            return 50
+           elif row["Q7"] == "Slightly confident":
+            return 25
+           elif row["Q7"] == "Not at all confident":
+            return 10
+           elif row["Q7"] == "No one in my household has any insurance":
+            return 0
+survey_data = survey_data.assign(score_7=survey_data.apply(set_score_7, axis = 1))  
+        
+
+#Q8 To what extent do you agree or disagree with the following statement: “My household plans ahead financially.”
+def set_score_8(row):
+           if row["Q8"] == "Agree strongly":
+            return 100
+           elif row["Q8"] == "Agree somewhat":
+            return 65
+           elif row["Q8"] == "Neither agree nor disagree":
+            return 35
+           elif row["Q8"] == "Disagree somewhat":
+            return 15
+           elif row["Q8"] == "Disagree strongly":
+            return 0
+survey_data = survey_data.assign(score_8=survey_data.apply(set_score_8, axis = 1))  
+
+#set variables for calculated columns
+score_list =  ['score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6', 'score_7', 'score_8']
+score_sum = survey_data[score_list].sum(axis=1, skipna=True)
+overall_score = survey_data[score_list].mean(axis=1, skipna=True)
+spend_list =  ['score_1', 'score_2']
+spend_score = survey_data[spend_list].mean(axis=1, skipna=True)
+save_list =  ['score_3', 'score_4']
+save_score = survey_data[save_list].mean(axis=1, skipna=True)
+borrow_list =  ['score_5', 'score_6']
+borrow_score = survey_data[borrow_list].mean(axis=1, skipna=True)
+plan_list =  ['score_7', 'score_8']
+spend_score = survey_data[plan_list].mean(axis=1, skipna=True)
+
+#append new columns to survey_data
+survey_data = survey_data.assign(score_sum=score_sum) 
+survey_data = survey_data.assign(overall_score=overall_score) 
+survey_data = survey_data.assign(spend_score=spend_score)
+survey_data = survey_data.assign(save_score=save_score)
+survey_data = survey_data.assign(borrow_score=borrow_score)
+survey_data = survey_data.assign(plan_score=plan_score)
+
+survey_data.to_excel('C:/Users/Heather/Documents/Data Profiling/Advocacy/cfsi_scored.xlsx')
+
+
